@@ -155,6 +155,45 @@ int cscan()
 	return total;
 }
 
+int sstf()
+{
+	int total = 0;
+	int cur = cur_loc;
+	int sst = max_sec;
+	int rem_req = num_req;
+	int * req_tmp = (int*)malloc(sizeof(int) * num_req);
+	int i, j, dif, idx;
+
+	// Create temporary copy of request array
+	for (i = 0; i < num_req; ++i) {
+		req_tmp[i] = req[i];
+	}
+
+	while (rem_req > 0) {
+		// find shortest seek time from current location and add to total	
+		sst = rem_req;	
+		for (j = 0; j < rem_req; ++j) {
+			dif = abs(req_tmp[j] - cur);	
+			if (dif <= sst) {
+				sst = dif;
+				idx = j;
+			}	
+		}	
+		total += sst;
+		cur = req_tmp[idx];	
+
+		// remove request from temp list and decrement remaining request count
+		for (j = idx; j < rem_req; ++j) {
+			req_tmp[idx] = req_tmp[idx + 1];
+		}
+		--rem_req;
+	
+	}
+
+
+	return total;
+}
+
 int main (int argc, char** argv)
 {
 	FILE* fp = fopen("input.txt", "rt");
@@ -184,7 +223,7 @@ int main (int argc, char** argv)
 	fprintf(fp, "%d\n", fcfs());
 	fprintf(fp, "%d\n", scan());
 	fprintf(fp, "%d\n", cscan());
-
+	fprintf(fp, "%d\n", sstf());
 
 
 	fclose(fp);
