@@ -106,12 +106,51 @@ int scan()
 
 int cscan()
 {
-	int total = 0;
-
 	// sort req
+	int total = 0;
+	int cur = cur_loc;
+	int * req_tmp = (int*)malloc(sizeof(int) * num_req);
+	
+	int i, j;
+
+	// Create temporary copy of request array
+	for (i = 0; i < num_req; ++i) {
+		req_tmp[i] = req[i];
+	}
+	
+	// sort req_tmp in increasing order
+	for (i = 0; i < num_req; ++i) {
+		for (j = i; j < num_req; ++j) {
+			if (req_tmp[j] < req_tmp[i]) {
+				int t = req_tmp[j];
+				req_tmp[j] = req_tmp[i];
+				req_tmp[i] = t;
+			}
+		}
+	}
+
+	// Determine index of current request
+	for (i = 0; i < num_req; ++i) {
+		if (cur < req_tmp[i])
+		break;
+	}
+
 	// compute distance in increasing direction
-	// jump to beginning of the disk
-	// compute the remainder
+	for (j = i; j < num_req; ++j) {
+		total += abs(req_tmp[j] - cur);
+		cur = req_tmp[j];
+	}
+	cur = max_sec;
+
+	// jump to the beginning of the disk
+	total += abs(0 - cur);
+	cur = 0;
+
+	// compute distance of remainder
+	for (j = 0 ; j < i; ++j) {
+		total += abs(req_tmp[j] - cur);
+		cur = req_tmp[j];
+	}
 
 	return total;
 }
